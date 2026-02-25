@@ -178,10 +178,40 @@ button:active {
 
   padding-left: 15px;
 
-  opacity: 0; /* Starts hidden */
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .25s ease, transform .25s ease;
 
-  transition: opacity 0.3s ease;
+}
 
+#response.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#response h1,#response h2,#response h3,#response h4 {
+  margin:16px 0 8px;
+  font-weight:800;
+}
+
+#response p { margin:8px 0; }
+
+#response ul,#response ol {
+  padding-left:20px;
+  margin:8px 0;
+}
+
+#response li { margin-bottom:6px; }
+
+#response blockquote {
+  border-left:3px solid #E5E5E5;
+  padding-left:10px;
+}
+
+#response code {
+  background:#F2F2F2;
+  padding:2px 4px;
+  border-radius:3px;
 }
 
 

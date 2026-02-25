@@ -14,6 +14,9 @@
     <div id="scrub-status" class="scrub-status"></div>
 </div>
 
+<textarea id="query" placeholder="Ask your question or drop pay stub..."></textarea>
+<button id="analyze">Analyze</button>
+
 <div id="response"></div>
 
 <button id="toggle-citations" class="citation-toggle" style="display:none;">
@@ -24,13 +27,8 @@
 
 <div class="fact" id="fact"></div>
 
-<textarea id="query" placeholder="Ask your question or drop pay stub..."></textarea>
-  <button id="analyze">Analyze</button>
-
-  <div id="response"></div>
-
-  <div class="fact" id="fact"></div>
-
-  <script src="sidebar.js"></script>
+<script src="lib/dompurify.min.js"></script>
+<script src="lib/marked.min.js"></script>
+<script src="sidebar.js"></script>
 </body>
 </html>

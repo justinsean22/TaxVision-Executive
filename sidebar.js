@@ -82,29 +82,36 @@ chrome.storage.local.get(["selectedText"], (res) => { if (res.selectedText) quer
 chrome.storage.onChanged.addListener((changes, ns) => {
   if (ns === "local" && changes.selectedText) {
     queryInput.value = changes.selectedText.newValue;
-    responseDiv.style.opacity = 0;
+    responseDiv.classList.remove("visible");
     analyzeBtn.click();
   }
 });
 
+let isAnalyzing = false;
+
 // 4. THE EXECUTIVE ANALYSIS LOGIC
 analyzeBtn.addEventListener("click", async () => {
-  const query = queryInput.value.trim();
-  if (!query) return;
-
-  const sanitized = scrubPII(query);
-  const mode = detectMode(query);
-  const wasScrubbed = sanitized !== query;
-
-  // UI Reset
-  if (scrubStatus) scrubStatus.innerText = wasScrubbed ? "Sensitive identifiers masked locally." : "";
-  statusDiv.innerText = "Analyzing IRS Intelligence...";
-  statusDiv.style.color = "#1A1A1B";
-  responseDiv.style.opacity = 0;
-  if (citationToggle) citationToggle.style.display = "none";
-  if (citationsContainer) citationsContainer.style.display = "none";
+  if (isAnalyzing) return;
+  isAnalyzing = true;
 
   try {
+    const query = queryInput.value.trim();
+    if (!query) return;
+
+    const sanitized = scrubPII(query);
+    const mode = detectMode(query);
+    const wasScrubbed = sanitized !== query;
+
+    // UI Reset
+    if (scrubStatus) scrubStatus.innerText = wasScrubbed ? "Sensitive identifiers masked locally." : "";
+    statusDiv.innerText = "Analyzing IRS Intelligence...";
+    statusDiv.style.color = "#1A1A1B";
+
+    responseDiv.classList.remove("visible");
+
+    if (citationToggle) citationToggle.style.display = "none";
+    if (citationsContainer) citationsContainer.style.display = "none";
+
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -116,29 +123,32 @@ analyzeBtn.addEventListener("click", async () => {
 
     // Render logic based on mode
     if (data.mode === "calculation" && data.deduction !== undefined) {
-      responseDiv.innerHTML = `
+      responseDiv.innerHTML = DOMPurify.sanitize(`
         <div class="highlight">
           <strong>OBBBA Calculation:</strong><br>
           Estimated Deduction: $${data.deduction.toFixed(2)}
-        </div>`;
+        </div>`);
     } else {
-      responseDiv.innerText = data.answer || "No guidance found.";
+      const markdown = data.answer || "No guidance found.";
+      const rawHTML = marked.parse(markdown);
+      responseDiv.innerHTML = DOMPurify.sanitize(rawHTML);
     }
+
+    responseDiv.classList.add("visible");
 
     // Handle Citations
     renderCitations(data.citations);
 
-    setTimeout(() => {
-      responseDiv.style.opacity = 1;
-      statusDiv.innerText = "Research Complete";
-      statusDiv.style.color = "#2ECC71";
-    }, 50);
+    statusDiv.innerText = "Research Complete";
+    statusDiv.style.color = "#2ECC71";
 
   } catch (error) {
     statusDiv.innerText = "Connection Error";
     statusDiv.style.color = "#E74C3C";
     responseDiv.innerText = "Unable to reach TaxVision Research Engine.";
-    responseDiv.style.opacity = 1;
+    responseDiv.classList.add("visible");
+  } finally {
+    isAnalyzing = false;
   }
 });
 
