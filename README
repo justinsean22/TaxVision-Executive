@@ -1,0 +1,87 @@
+# TaxVision Executive 🏛️
+
+**Professional 2026 IRS Research Intelligence & Workflow Automation**
+
+TaxVision Executive is a high-performance Vertical SaaS solution designed for licensed income tax preparers. It bridges the gap between complex IRS documentation and real-time filing workflows by providing an autonomous AI co-pilot that lives directly in the browser.
+
+---
+
+## 🚀 Key Features
+
+* **Context-Aware Intelligence:** Highlight any technical tax text or pay stub data to receive instant analysis via the Chrome Side Panel.
+* **Executive UI/UX:** A high-contrast, professional interface featuring micro-interactions and tactile feedback for zero-distraction research.
+* **Floating Tax Facts:** A dynamic, rotating intelligence feed that pulls the latest 2026 technical updates directly from IRS source documents.
+* **Autonomous Research Engine:** Powered by a Google Cloud backend and Vertex AI Search for "hallucination-resistant" technical summaries.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** Chrome Extension Manifest V3 (JavaScript, HTML5, CSS3).
+* **Backend:** Python 3.12, Flask, Google Functions Framework.
+* **AI/Infrastructure:** * **Vertex AI Search:** RAG (Retrieval-Augmented Generation) over 2026 IRS documentation.
+* **Google Cloud Run:** Fully managed serverless execution.
+* **Firebase:** Professional-grade hosting and storage.
+
+
+
+---
+
+## 📂 Repository Structure
+
+```text
+├── extension/             # Chrome Extension source code
+│   ├── background.js      # Service worker for context menus & side panel
+│   ├── sidebar.js         # Intelligence & micro-interaction logic
+│   ├── sidebar.html       # Executive UI structure
+│   └── sidebar.css        # Professional styling & animations
+├── backend/               # Python Research Engine
+│   ├── main.py            # API Router & Intelligence logic
+│   └── requirements.txt   # Dependencies (flask-cors, google-cloud-discoveryengine)
+└── README.md              # Project documentation
+
+```
+
+---
+
+## ⚡ Quick Start (Developer Setup)
+
+### 1. Extension Setup
+
+1. Open Chrome and navigate to `chrome://extensions`.
+2. Enable **Developer Mode** (top right).
+3. Click **Load Unpacked** and select the `/extension` folder.
+4. Pin **TaxVision Executive** to your toolbar.
+
+### 2. Backend Deployment
+
+1. Ensure you have the `gcloud` CLI installed and authenticated.
+2. Navigate to the `/backend` directory.
+3. Deploy to Google Cloud Run:
+```bash
+gcloud run deploy asktaxwiki --source . --region us-south1 --allow-unauthenticated
+
+```
+
+
+
+---
+
+## 📈 Roadmap
+
+* [ ] **Phase 1:** Real-time IRS document parsing (Current).
+* [ ] **Phase 2:** Automated "Copy to Clipboard" for tax software integration.
+* [ ] **Phase 3:** PDF Generation for research audit trails.
+* [ ] **Phase 4:** Official Chrome Web Store Release.
+
+---
+
+## ⚖️ License
+
+Copyright © 2026 TaxVision Intelligence. All rights reserved. Built for professional tax preparation accuracy.
+
+---
+
+ **Note:** This tool is an assistant for professionals and does not constitute legal or personal tax advice. Always verify AI-generated summaries against official IRS code.
+
+

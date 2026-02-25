@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div class="header">
+    <h1>TaxVision Executive</h1>
+    <span class="sub">2026 Research Intelligence</span>
+</div>
+
+<div class="system-meta" style="margin-top: 10px;">
+    <div id="status" class="status">System Ready</div>
+    <div id="scrub-status" class="scrub-status"></div>
+</div>
+
+<div id="response"></div>
+
+<button id="toggle-citations" class="citation-toggle" style="display:none;">
+    View Citations
+</button>
+
+<div id="citations-container" class="citations-container" style="display:none;"></div>
+
+<div class="fact" id="fact"></div>
+
+<textarea id="query" placeholder="Ask your question or drop pay stub..."></textarea>
+  <button id="analyze">Analyze</button>
+
+  <div id="response"></div>
+
+  <div class="fact" id="fact"></div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>

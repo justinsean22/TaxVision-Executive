@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "TaxVision Executive",
+  "description": "Professional 2026 IRS Research Intelligence for Tax Preparers.",
+  "version": "1.0.0",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://asktaxwiki-810362790827.us-south1.run.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "action": {
+    "default_title": "Open TaxVision"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      }
+    }
+  },
+  "minimum_chrome_version": "114"
+}
