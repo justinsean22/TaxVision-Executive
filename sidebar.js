@@ -47,7 +47,7 @@ function renderCitations(citations) {
     citationsContainer.style.display = "none"; // Reset to closed on new search
     citationsContainer.innerHTML = citations.map(c => `
       <div class="citation-item">
-        <a href="${c.url}" target="_blank">🔗 ${c.title}</a>
+        <a href="${c.url}" target="_blank">&#128279; ${c.title}</a>
       </div>
     `).join("");
   }
