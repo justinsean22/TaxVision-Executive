@@ -7,6 +7,7 @@ import json
 import functions_framework
 from flask import jsonify
 from google.cloud import discoveryengine_v1 as discoveryengine
+from google.cloud import vision
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
@@ -71,6 +72,25 @@ def safe_extract_snippets(response, max_docs=3):
             continue
     return sections
 
+def extract_text_from_image(file_bytes: bytes) -> str:
+    try:
+        client = vision.ImageAnnotatorClient()
+        image = vision.Image(content=file_bytes)
+        response = client.text_detection(image=image)
+
+        if response.error.message:
+            logging.error(f"OCR Error: {response.error.message}")
+            return ""
+
+        texts = response.text_annotations
+        if texts:
+            return texts[0].description.strip()
+
+        return ""
+    except Exception as e:
+        logging.error(f"OCR Processing Failed: {e}")
+        return ""
+
 # ---------------------------------------
 # OBBBA CALCULATION ENGINE
 # ---------------------------------------
@@ -125,9 +145,32 @@ def handle_tax_bot(request, headers):
     if request.method != "POST":
         return jsonify({"error": "POST required"}), 405, headers
 
-    request_json = request.get_json(silent=True) or {}
-    user_query = request_json.get("question", "").strip()
-    mode = request_json.get("mode", "research")
+    # Detect multipart form (image upload)
+    if request.content_type and request.content_type.startswith("multipart/form-data"):
+        file = request.files.get("file")
+
+        if not file:
+            return jsonify({"error": "No file provided."}), 400, headers
+
+        if not file.mimetype.startswith("image/"):
+            return jsonify({"error": "Only image files supported."}), 400, headers
+
+        file_bytes = file.read()
+
+        if len(file_bytes) > 5 * 1024 * 1024:
+            return jsonify({"error": "File exceeds 5MB limit."}), 400, headers
+
+        extracted_text = extract_text_from_image(file_bytes)
+
+        if not extracted_text:
+            return jsonify({"error": "Unable to extract text from image."}), 200, headers
+
+        user_query = extracted_text
+        mode = "calculation"
+    else:
+        request_json = request.get_json(silent=True) or {}
+        user_query = request_json.get("question", "").strip()
+        mode = request_json.get("mode", "research")
 
     if not user_query:
         return jsonify({"answer": "System online."}), 200, headers

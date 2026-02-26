@@ -53,6 +53,41 @@ function renderCitations(citations) {
   }
 }
 
+// --- Response Handling ---
+function handleResponse(data) {
+    if (data.error) {
+        responseDiv.innerText = data.error;
+        responseDiv.style.color = "#E74C3C"; // Error color
+        responseDiv.classList.add("visible");
+        statusDiv.innerText = "Error";
+        statusDiv.style.color = "#E74C3C";
+        return;
+    } else {
+        responseDiv.style.color = ""; // Reset color
+    }
+
+    // Render logic based on mode
+    if (data.mode === "calculation" && data.deduction !== undefined) {
+      responseDiv.innerHTML = DOMPurify.sanitize(`
+        <div class="highlight">
+          <strong>OBBBA Calculation:</strong><br>
+          Estimated Deduction: $${data.deduction.toFixed(2)}
+        </div>`);
+    } else {
+      const markdown = data.answer || "No guidance found.";
+      const rawHTML = marked.parse(markdown);
+      responseDiv.innerHTML = DOMPurify.sanitize(rawHTML);
+    }
+
+    responseDiv.classList.add("visible");
+
+    // Handle Citations
+    renderCitations(data.citations);
+
+    statusDiv.innerText = "Research Complete";
+    statusDiv.style.color = "#2ECC71";
+}
+
 // --- Event Listeners ---
 
 // 1. Citation Toggle Logic
@@ -71,7 +106,37 @@ queryInput.addEventListener("drop", async (e) => {
   e.preventDefault();
   queryInput.style.border = "1px solid #E5E5E5";
   const file = e.dataTransfer.files[0];
-  if (file && (file.type === "text/plain" || file.name.endsWith('.csv'))) {
+
+  if (!file) return;
+
+  if (file.type.startsWith("image/")) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      analyzeBtn.disabled = true;
+      statusDiv.innerText = "Processing Image...";
+      statusDiv.style.color = "#1A1A1B";
+      responseDiv.classList.remove("visible");
+      if (citationToggle) citationToggle.style.display = "none";
+      if (citationsContainer) citationsContainer.style.display = "none";
+
+      try {
+          const res = await fetch(API_URL, {
+            method: "POST",
+            body: formData
+          });
+          const data = await res.json();
+          handleResponse(data);
+      } catch (err) {
+          statusDiv.innerText = "Connection Error";
+          statusDiv.style.color = "#E74C3C";
+          responseDiv.innerText = "Unable to process image.";
+          responseDiv.classList.add("visible");
+      } finally {
+          analyzeBtn.disabled = false;
+      }
+  }
+  else if (file.type === "text/plain" || file.name.endsWith(".csv")) {
     queryInput.value = await file.text();
     analyzeBtn.click();
   }
@@ -121,26 +186,7 @@ analyzeBtn.addEventListener("click", async () => {
     if (!res.ok) throw new Error("Network Error");
     const data = await res.json();
 
-    // Render logic based on mode
-    if (data.mode === "calculation" && data.deduction !== undefined) {
-      responseDiv.innerHTML = DOMPurify.sanitize(`
-        <div class="highlight">
-          <strong>OBBBA Calculation:</strong><br>
-          Estimated Deduction: $${data.deduction.toFixed(2)}
-        </div>`);
-    } else {
-      const markdown = data.answer || "No guidance found.";
-      const rawHTML = marked.parse(markdown);
-      responseDiv.innerHTML = DOMPurify.sanitize(rawHTML);
-    }
-
-    responseDiv.classList.add("visible");
-
-    // Handle Citations
-    renderCitations(data.citations);
-
-    statusDiv.innerText = "Research Complete";
-    statusDiv.style.color = "#2ECC71";
+    handleResponse(data);
 
   } catch (error) {
     statusDiv.innerText = "Connection Error";
