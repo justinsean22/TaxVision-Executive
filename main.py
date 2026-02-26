@@ -145,8 +145,22 @@ def handle_tax_bot(request, headers):
 
     # --- RESEARCH MODE ---
     client = create_client()
+
+    system_instruction = (
+        "You are a Senior Tax Research Intelligence agent. "
+        "You MUST structure your response using Markdown. "
+        "ALWAYS break up long paragraphs by using headers (###) for concepts "
+        "and bullet points (*) for lists and requirements. "
+        "Never return a single long paragraph. No filler. No disclaimers."
+    )
+
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
-        summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(summary_result_count=5)
+        summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
+            summary_result_count=5,
+            model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
+                preamble=system_instruction
+            ),
+        )
     )
     search_request = discoveryengine.SearchRequest(
         serving_config=SERVING_CONFIG,
